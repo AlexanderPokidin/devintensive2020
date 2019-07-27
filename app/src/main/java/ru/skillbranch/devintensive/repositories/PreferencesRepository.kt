@@ -2,28 +2,57 @@ package ru.skillbranch.devintensive.repositories
 
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import ru.skillbranch.devintensive.App
 import ru.skillbranch.devintensive.models.Profile
 
 object PreferencesRepository {
+
+    private const val ET_FIRST_NAME = "ET_FIRST_NAME"
+    private const val ET_LAST_NAME = "ET_LAST_NAME"
+    private const val ET_ABOUT = "ET_ABOUT"
+    private const val ET_REPOSITORY = "ET_REPOSITORY"
+    private const val TV_RATING = "TV_RATING"
+    private const val TV_RESPECT = "TV_RESPECT"
+
     private val prefs: SharedPreferences by lazy {
-        val ctx = null
+        val ctx = App.applicationContext()
         PreferenceManager.getDefaultSharedPreferences(ctx)
     }
 
-    fun getProfileData(): Profile? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    fun getProfile(): Profile = Profile(
 
-    fun saveProfileData(profile: Profile) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    fun getProfile(): Profile? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+        prefs.getString(ET_FIRST_NAME, "")!!,
+        prefs.getString(ET_LAST_NAME, "")!!,
+        prefs.getString(ET_ABOUT, "")!!,
+        prefs.getString(ET_REPOSITORY, "")!!,
+        prefs.getInt(TV_RATING, 0),
+        prefs.getInt(TV_RESPECT, 0)
+    )
 
     fun saveProfile(profile: Profile) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        with(profile) {
+            putValue(ET_FIRST_NAME to firstName)
+            putValue(ET_LAST_NAME to lastName)
+            putValue(ET_ABOUT to about)
+            putValue(ET_REPOSITORY to repository)
+            putValue(TV_RATING to rating)
+            putValue(TV_RESPECT to respect)
+        }
+    }
+
+    private fun putValue(pair: Pair<String, Any>) = with(prefs.edit()) {
+        val key = pair.first
+        val value = pair.second
+
+        when (value) {
+            is String -> putString(key, value)
+            is Int -> putInt(key, value)
+            is Boolean -> putBoolean(key, value)
+            is Long -> putLong(key, value)
+            is Float -> putFloat(key, value)
+            else -> error("Only primutive types can be stored in Shared Preferences")
+        }
+        apply()
     }
 
 }
